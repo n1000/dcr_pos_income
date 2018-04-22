@@ -44,7 +44,7 @@ def get_decoded_tx(txid):
     tx_contents = json.loads(r.stdout)
 
     if tx_contents['txid'] != txid:
-        # todo: enhance output, or remove sanity check
+        # TODO: enhance output, or remove sanity check
         raise RuntimeError('TXID returned by dcrctl is not as expected!')
 
     return tx_contents
@@ -59,7 +59,7 @@ def get_block_header(block_hash):
     header = json.loads(r.stdout)
 
     if header['hash'] != block_hash:
-        # todo: enhance output, or remove sanity check
+        # TODO: enhance output, or remove sanity check
         raise RuntimeError('Block header returned by dcrctl is not as expected!')
 
     return header
@@ -110,7 +110,6 @@ def main():
         logging.info('invalid format_mode given, defaulting to verbose')
         args.format_mode = 'verbose'
 
-    # to do -- try to parse these here, and convert to datetime object?
     first_date = datetime.strptime(args.first_date, '%Y-%m-%d')
     last_date = datetime.strptime(args.last_date, '%Y-%m-%d')
 
