@@ -22,7 +22,6 @@ import csv
 from datetime import datetime
 import json
 import logging
-import math
 import subprocess
 
 default_format_mode = 'verbose'
