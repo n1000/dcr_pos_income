@@ -36,6 +36,8 @@ The inputs are:
 python3 dcr_pos_income.py
 ```
 
+By default, the script will print all PoS income from the previous calendar year, using the verbose output format.
+
 ## Command Line Help
 ```
 usage: dcr_pos_income.py [-h] [--first_date FIRST_DATE] [--last_date LAST_DATE]
