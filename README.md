@@ -17,7 +17,7 @@ The inputs are:
 
 * Somewhat slow (due to all the dcrctl queries)
 
-## Setup Steps / Prerequisites
+## Prerequisites
 
 1. Save all transactions to a file:
     ```
@@ -27,6 +27,8 @@ The inputs are:
     ```
     wget -O dcr_prices.csv https://coinmetrics.io/data/dcr.csv
     ```
+
+3. dcrd instance accessible with default dcrctl options. Wallet access is not required. dcrd should be running with the txindex option turned on.
 
 ## Basic Usage
 
