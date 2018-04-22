@@ -25,6 +25,8 @@ import logging
 import math
 import subprocess
 
+default_format_mode = 'verbose'
+
 def exec_cmd(cmd):
     return subprocess.run(cmd, check=True, universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -98,8 +100,14 @@ def main():
         help='Beginning of time period')
     parser.add_argument('--last_date', default='2017-01-01',
         help='End of time period')
+    parser.add_argument('--format', dest='format_mode', default=default_format_mode,
+        help='select output format: verbose, compact')
 
     args = parser.parse_args()
+
+    if args.format_mode != 'verbose' and args.format_mode != 'compact':
+        logging.info('invalid format_mode given, defaulting to verbose')
+        args.format_mode = 'verbose'
 
     # to do -- try to parse these here, and convert to datetime object?
     first_date = datetime.strptime(args.first_date, '%Y-%m-%d')
@@ -158,10 +166,12 @@ def main():
             fees_dcr += cur_dcr_fee
             fees_usd += cur_usd_fee
 
-            print('Vote: Date: {}, DCR: {:.04f}, USD: {:.02f}, Day\'s Price: {:.02f}'.format(tx_date_str, cur_dcr_income, cur_usd_income, p_vday))
-            print('Purchase Fee: Date: {} DCR: {:.04f}, USD: {:.02f}, Day\'s Price: {:.02f}'.format(ticket_date_str, cur_dcr_fee, cur_usd_fee, p_tday))
+            if args.format_mode == 'compact':
+                print('Date: {}, Income: {:.02f} USD, Fee: {:.02f} USD'.format(tx_date_str, cur_usd_income, cur_usd_fee))
+            elif args.format_mode == 'verbose':
+                print('Vote: [Date: {}, Income: {:.04f} DCR x {:.02f} USD/DCR = {:.02f} USD] Fee: [Date: {}, {:.04f} DCR x {:.02f} USD/DCR = {:.02f} USD]'.format(tx_date_str, cur_dcr_income, p_vday, cur_usd_income, ticket_date_str, cur_dcr_fee, p_tday, cur_usd_fee))
 
-    print('Total Income: DCR: {:.04f}, USD: {:.02f}'.format(income_dcr, income_usd))
+    print('\nTotal Income: DCR: {:.04f}, USD: {:.02f}'.format(income_dcr, income_usd))
     print('Total Fees: DCR: {:.04f}, USD: {:.02f}'.format(fees_dcr, fees_usd))
 
 if __name__ == '__main__':
