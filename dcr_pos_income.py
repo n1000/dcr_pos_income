@@ -25,8 +25,8 @@ import logging
 import subprocess
 
 default_format_mode = 'verbose'
-csv_prices_file = 'dcr_prices.csv'
-transactions_file = 'all_transactions.json'
+default_csv_prices_file = 'dcr_prices.csv'
+default_transactions_file = 'all_transactions.json'
 
 def exec_cmd(cmd):
     return subprocess.run(cmd, check=True, universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -105,6 +105,10 @@ def main():
         help='end of time period')
     parser.add_argument('--format', dest='format_mode', default=default_format_mode,
         help='select output format: verbose, compact')
+    parser.add_argument('--prices', dest='csv_prices_file', default=default_csv_prices_file,
+        help='DCR CSV prices file (default: {})'.format(default_csv_prices_file))
+    parser.add_argument('--tx_file', dest='transactions_file', default=default_transactions_file,
+        help='DCR transactions file (default: {})'.format(default_transactions_file))
 
     args = parser.parse_args()
 
@@ -115,14 +119,14 @@ def main():
     first_date = datetime.strptime(args.first_date, '%Y-%m-%d').astimezone()
     last_date = datetime.strptime(args.last_date, '%Y-%m-%d').astimezone()
 
-    prices = load_prices(csv_prices_file)
+    prices = load_prices(args.csv_prices_file)
 
     income_dcr = 0
     income_usd = 0
     fees_dcr = 0
     fees_usd = 0
 
-    with open(transactions_file, mode='r') as json_file:
+    with open(args.transactions_file, mode='r') as json_file:
         tx_db = json.load(json_file)
 
     for r in tx_db:

@@ -54,9 +54,11 @@ calendar year, using the verbose output format.
 
 ## Command Line Help
 ```shell-session
-$ dcr_pos_income.py --help
+$ ./dcr_pos_income.py --help
 usage: dcr_pos_income.py [-h] [--first_date FIRST_DATE]
                          [--last_date LAST_DATE] [--format FORMAT_MODE]
+                         [--prices CSV_PRICES_FILE]
+                         [--tx_file TRANSACTIONS_FILE]
 
 Calculate Decred PoS Income Details
 
@@ -67,6 +69,11 @@ optional arguments:
   --last_date LAST_DATE
                         end of time period
   --format FORMAT_MODE  select output format: verbose, compact
+  --prices CSV_PRICES_FILE
+                        DCR CSV prices file (default: dcr_prices.csv)
+  --tx_file TRANSACTIONS_FILE
+                        DCR transactions file (default: all_transactions.json)
+
 ```
 
 ## Example output
