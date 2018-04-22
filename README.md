@@ -19,6 +19,10 @@ was just used to vote.
 
 * Currently assumes USD currency
 
+* The price database only has the opening price, so if the price
+  changed a lot during the day a vote takes place, the DCR/USD
+  conversion ratio will be incorrect.
+
 * Somewhat slow (due to all the dcrctl queries)
 
 ## Prerequisites
