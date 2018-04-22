@@ -23,7 +23,7 @@ The inputs are:
     ```
     dcrctl --wallet listtransactions '*' 999999 0 false > all_transactions.json
     ```
-2. Download a DCR prices data base from [here](https://coinmetrics.io/data-downloads/) ([direct link]()):
+2. Download a DCR prices data base from [here](https://coinmetrics.io/data-downloads/) ([direct link](https://coinmetrics.io/data/dcr.csv)):
     ```
     wget -O dcr_prices.csv https://coinmetrics.io/data/dcr.csv
     ```
