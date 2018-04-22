@@ -19,7 +19,7 @@
 
 import argparse
 import csv
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 import logging
 import subprocess
@@ -80,12 +80,15 @@ def load_prices(filename):
 
     return db
 
-def get_days_price(db, date_str):
+def get_days_price(db, date):
+    utc_date = date.astimezone(timezone.utc)
+    utc_date_str = utc_date.strftime('%Y-%m-%d')
+
     for (d, p) in db:
-        if d == date_str:
+        if d == utc_date_str:
             return float(p)
 
-    raise RuntimeError('Could not find date {} in price database!'.format(date_str))
+    raise RuntimeError('Could not find date {} in price database!'.format(utc_date_str))
 
 def main():
     logging.basicConfig(level=logging.ERROR)
@@ -109,8 +112,8 @@ def main():
         logging.info('invalid format_mode given, defaulting to verbose')
         args.format_mode = 'verbose'
 
-    first_date = datetime.strptime(args.first_date, '%Y-%m-%d')
-    last_date = datetime.strptime(args.last_date, '%Y-%m-%d')
+    first_date = datetime.strptime(args.first_date, '%Y-%m-%d').astimezone()
+    last_date = datetime.strptime(args.last_date, '%Y-%m-%d').astimezone()
 
     prices = load_prices(csv_prices_file)
 
@@ -125,17 +128,17 @@ def main():
     for r in tx_db:
         utc_tstamp = int(r['blocktime'])
 
-        tx_date = datetime.fromtimestamp(utc_tstamp)
-        tx_date_str = tx_date.strftime('%Y-%m-%d')
+        tx_date = datetime.fromtimestamp(utc_tstamp, timezone.utc)
+        local_tx_date_str = tx_date.astimezone().strftime('%Y-%m-%d')
 
         if tx_date < first_date or tx_date > last_date:
-            logging.debug('skipping out of range date: {}'.format(tx_date_str))
+            logging.debug('skipping out of range date: {}'.format(local_tx_date_str))
             continue
 
         if r['txtype'] == 'vote' and r['vout'] == 0:
-            p_vday = get_days_price(prices, tx_date_str)
+            p_vday = get_days_price(prices, tx_date)
 
-            logging.debug('Date: {}, Price: {:.02f}, Blocktime: {}'.format(tx_date_str, p_vday, utc_tstamp))
+            logging.debug('Date: {}, Price: {:.02f}, Blocktime: {}'.format(local_tx_date_str, p_vday, utc_tstamp))
 
             tx_contents = get_decoded_tx(r['txid'])
             subsidy = tx_contents['vin'][0]['amountin']
@@ -152,9 +155,10 @@ def main():
             ticket_block_time = get_block_time(ticket_block)
 
             # get price based on timestamp
-            ticket_date = datetime.fromtimestamp(ticket_block_time)
-            ticket_date_str = ticket_date.strftime('%Y-%m-%d')
-            p_tday = get_days_price(prices, ticket_date_str)
+            ticket_date = datetime.fromtimestamp(ticket_block_time, timezone.utc)
+            local_ticket_date_str = ticket_date.astimezone().strftime('%Y-%m-%d')
+
+            p_tday = get_days_price(prices, ticket_date)
 
             # get fee details from ticket purchase
             ticket_tx_contents = get_decoded_tx(tx_contents['vin'][1]['txid'])
@@ -166,9 +170,9 @@ def main():
             fees_usd += cur_usd_fee
 
             if args.format_mode == 'compact':
-                print('Date: {}, Income: {:.02f} USD, Fee: {:.02f} USD'.format(tx_date_str, cur_usd_income, cur_usd_fee))
+                print('Date: {}, Income: {:.02f} USD, Fee: {:.02f} USD'.format(local_tx_date_str, cur_usd_income, cur_usd_fee))
             elif args.format_mode == 'verbose':
-                print('Vote: [Date: {}, Income: {:.04f} DCR x {:.02f} USD/DCR = {:.02f} USD] Fee: [Date: {}, {:.04f} DCR x {:.02f} USD/DCR = {:.02f} USD]'.format(tx_date_str, cur_dcr_income, p_vday, cur_usd_income, ticket_date_str, cur_dcr_fee, p_tday, cur_usd_fee))
+                print('Vote: [Date: {}, Income: {:.04f} DCR x {:.02f} USD/DCR = {:.02f} USD] Fee: [Date: {}, {:.04f} DCR x {:.02f} USD/DCR = {:.02f} USD]'.format(local_tx_date_str, cur_dcr_income, p_vday, cur_usd_income, local_ticket_date_str, cur_dcr_fee, p_tday, cur_usd_fee))
 
     print('\nTotal Income: DCR: {:.04f}, USD: {:.02f}'.format(income_dcr, income_usd))
     print('Total Fees: DCR: {:.04f}, USD: {:.02f}'.format(fees_dcr, fees_usd))
