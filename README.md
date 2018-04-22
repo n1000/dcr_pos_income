@@ -11,6 +11,10 @@ The inputs are:
 
 * A Decred price database file
 
+The script will compute the DCR and USD income for each vote, as
+well as look up the fee associated with purchasing the ticket that
+was just used to vote.
+
 ## Limitations
 
 * Currently assumes USD currency
@@ -23,12 +27,17 @@ The inputs are:
     ```shell-session
     dcrctl --wallet listtransactions '*' 999999 0 false > all_transactions.json
     ```
-2. Download a DCR prices data base from [here](https://coinmetrics.io/data-downloads/) ([direct link](https://coinmetrics.io/data/dcr.csv)):
+2. Download a DCR prices data base from
+   [here](https://coinmetrics.io/data-downloads/)
+   ([direct link](https://coinmetrics.io/data/dcr.csv)):
+
     ```shell-session
     wget -O dcr_prices.csv https://coinmetrics.io/data/dcr.csv
     ```
 
-3. dcrd instance accessible with default dcrctl options. Wallet access is not required. dcrd should be running with the txindex option turned on.
+3. dcrd instance accessible with default dcrctl options. Wallet
+   access is not required. dcrd should be running with the txindex
+   option turned on.
 
 ## Basic Usage
 
@@ -36,7 +45,8 @@ The inputs are:
 $ python3 dcr_pos_income.py
 ```
 
-By default, the script will print all PoS income from the previous calendar year, using the verbose output format.
+By default, the script will print all PoS income from the previous
+calendar year, using the verbose output format.
 
 ## Command Line Help
 ```
