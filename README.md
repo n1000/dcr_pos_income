@@ -39,9 +39,9 @@ was just used to vote.
     $ wget -O dcr_prices.csv https://coinmetrics.io/data/dcr.csv
     ```
 
-3. dcrd instance accessible with default dcrctl options. Wallet
-   access is not required. dcrd should be running with the txindex
-   option turned on.
+3. A dcrd instance must be running and accessible with default
+   dcrctl options. Wallet access is not required. dcrd should be
+   running with the txindex option turned on.
 
 ## Basic Usage
 
