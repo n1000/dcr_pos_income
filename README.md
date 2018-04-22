@@ -25,14 +25,14 @@ was just used to vote.
 
 1. Save all transactions to a file:
     ```shell-session
-    dcrctl --wallet listtransactions '*' 999999 0 false > all_transactions.json
+    $ dcrctl --wallet listtransactions '*' 999999 0 false > all_transactions.json
     ```
 2. Download a DCR prices data base from
    [here](https://coinmetrics.io/data-downloads/)
    ([direct link](https://coinmetrics.io/data/dcr.csv)):
 
     ```shell-session
-    wget -O dcr_prices.csv https://coinmetrics.io/data/dcr.csv
+    $ wget -O dcr_prices.csv https://coinmetrics.io/data/dcr.csv
     ```
 
 3. dcrd instance accessible with default dcrctl options. Wallet
