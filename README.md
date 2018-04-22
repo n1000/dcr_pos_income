@@ -20,11 +20,11 @@ The inputs are:
 ## Prerequisites
 
 1. Save all transactions to a file:
-    ```
+    ```shell-session
     dcrctl --wallet listtransactions '*' 999999 0 false > all_transactions.json
     ```
 2. Download a DCR prices data base from [here](https://coinmetrics.io/data-downloads/) ([direct link](https://coinmetrics.io/data/dcr.csv)):
-    ```
+    ```shell-session
     wget -O dcr_prices.csv https://coinmetrics.io/data/dcr.csv
     ```
 
@@ -32,8 +32,8 @@ The inputs are:
 
 ## Basic Usage
 
-```
-python3 dcr_pos_income.py
+```shell-session
+$ python3 dcr_pos_income.py
 ```
 
 By default, the script will print all PoS income from the previous calendar year, using the verbose output format.
@@ -58,7 +58,7 @@ optional arguments:
 ## Example output
 
 1. Verbose output:
-```
+```shell-session
 $ ./dcr_pos_income.py --format verbose --first_date "2017-04-22" --last_date "2017-05-10"
 Vote: [Date: 2017-04-22, Income: 1.5340 DCR x 14.89 USD/DCR = 22.84 USD] Fee: [Date: 2017-03-29, 0.0116 DCR x 12.99 USD/DCR = 0.15 USD]
 Vote: [Date: 2017-04-22, Income: 1.5340 DCR x 14.89 USD/DCR = 22.84 USD] Fee: [Date: 2017-03-05, 0.0030 DCR x 2.14 USD/DCR = 0.01 USD]
@@ -72,11 +72,10 @@ Vote: [Date: 2017-05-09, Income: 1.5188 DCR x 17.23 USD/DCR = 26.17 USD] Fee: [D
 
 Total Income: DCR: 13.7299, USD: 216.35
 Total Fees: DCR: 0.1315, USD: 1.79
-
 ```
 
 2. Compact output:
-```
+```shell-session
 $ ./dcr_pos_income.py --format compact --first_date "2017-04-22" --last_date "2017-05-10"
 Date: 2017-04-22, Income: 22.84 USD, Fee: 0.15 USD
 Date: 2017-04-22, Income: 22.84 USD, Fee: 0.01 USD
