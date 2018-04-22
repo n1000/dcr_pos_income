@@ -91,15 +91,16 @@ def get_days_price(db, date_str):
 def main():
     logging.basicConfig(level=logging.ERROR)
 
-    parser = argparse.ArgumentParser(description='Calculate PoS Tax Details')
+    parser = argparse.ArgumentParser(description='Calculate Decred PoS Income Details')
 
-    # to do -- by default, use the last year for computation
-    # to do -- to determine the fee, we may actually have to start before
-    # the start date, to look up the fee for buying the ticket
-    parser.add_argument('--first_date', default='2015-01-01',
-        help='Beginning of time period')
-    parser.add_argument('--last_date', default='2017-01-01',
-        help='End of time period')
+    last_year = str(datetime.now().year - 1)
+    default_first_date = last_year + '-01-01'
+    default_last_date = last_year + '-12-31'
+
+    parser.add_argument('--first_date', default=default_first_date,
+        help='beginning of time period')
+    parser.add_argument('--last_date', default=default_last_date,
+        help='end of time period')
     parser.add_argument('--format', dest='format_mode', default=default_format_mode,
         help='select output format: verbose, compact')
 
