@@ -53,9 +53,10 @@ By default, the script will print all PoS income from the previous
 calendar year, using the verbose output format.
 
 ## Command Line Help
-```
-usage: dcr_pos_income.py [-h] [--first_date FIRST_DATE] [--last_date LAST_DATE]
-                     [--format FORMAT_MODE]
+```shell-session
+$ dcr_pos_income.py --help
+usage: dcr_pos_income.py [-h] [--first_date FIRST_DATE]
+                         [--last_date LAST_DATE] [--format FORMAT_MODE]
 
 Calculate Decred PoS Income Details
 
@@ -66,7 +67,6 @@ optional arguments:
   --last_date LAST_DATE
                         end of time period
   --format FORMAT_MODE  select output format: verbose, compact
-
 ```
 
 ## Example output
