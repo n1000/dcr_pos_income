@@ -4,28 +4,35 @@ This is a small python script that can help calculate the PoS income
 that has occured over a particular time period.
 
 The inputs are:
-	* A transaction file, dumped from your Decred wallet
-	* Blockchain transaction details, accessed automatically via dcrctl
-	* A Decred price database file
+
+* A transaction file, dumped from your Decred wallet
+
+* Blockchain transaction details, accessed automatically via dcrctl
+
+* A Decred price database file
 
 ## Limitations
-	* Currently assumes USD currency
-	* Somewhat slow (due to all the dcrctl queries)
+
+* Currently assumes USD currency
+
+* Somewhat slow (due to all the dcrctl queries)
 
 ## Setup Steps / Prerequisites
-	1. Save all transactions to a file:
-		```
-		dcrctl --wallet listtransactions '*' 999999 0 false > all_transactions.json
-		```
-	2. Download a DCR prices data base from [here](https://coinmetrics.io/data-downloads/) ([direct link]()):
-		```
-		wget -O dcr_prices.csv https://coinmetrics.io/data/dcr.csv
-		```
+
+1. Save all transactions to a file:
+    ```
+    dcrctl --wallet listtransactions '*' 999999 0 false > all_transactions.json
+    ```
+2. Download a DCR prices data base from [here](https://coinmetrics.io/data-downloads/) ([direct link]()):
+    ```
+    wget -O dcr_prices.csv https://coinmetrics.io/data/dcr.csv
+    ```
 
 ## Basic Usage
-	```
-	python3 dcr_pos_income.py
-	```
+
+```
+python3 dcr_pos_income.py
+```
 
 ## Command Line Help
 ```
