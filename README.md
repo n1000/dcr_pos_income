@@ -1,4 +1,4 @@
-# pos_income.py -- Calculate Decred PoS Income Details
+# dcr_pos_income.py -- Calculate Decred PoS Income Details
 
 This is a small python script that can help calculate the PoS income
 that has occured over a particular time period.
@@ -24,12 +24,12 @@ The inputs are:
 
 ## Basic Usage
 	```
-	python3 pos_income.py
+	python3 dcr_pos_income.py
 	```
 
 ## Command Line Help
 ```
-usage: pos_income.py [-h] [--first_date FIRST_DATE] [--last_date LAST_DATE]
+usage: dcr_pos_income.py [-h] [--first_date FIRST_DATE] [--last_date LAST_DATE]
                      [--format FORMAT_MODE]
 
 Calculate Decred PoS Income Details
@@ -48,7 +48,7 @@ optional arguments:
 
 1. Verbose output:
 ```
-$ ./pos_income.py --format verbose --first_date "2017-04-22" --last_date "2017-05-10"
+$ ./dcr_pos_income.py --format verbose --first_date "2017-04-22" --last_date "2017-05-10"
 Vote: [Date: 2017-04-22, Income: 1.5340 DCR x 14.89 USD/DCR = 22.84 USD] Fee: [Date: 2017-03-29, 0.0116 DCR x 12.99 USD/DCR = 0.15 USD]
 Vote: [Date: 2017-04-22, Income: 1.5340 DCR x 14.89 USD/DCR = 22.84 USD] Fee: [Date: 2017-03-05, 0.0030 DCR x 2.14 USD/DCR = 0.01 USD]
 Vote: [Date: 2017-04-23, Income: 1.5340 DCR x 14.77 USD/DCR = 22.66 USD] Fee: [Date: 2017-02-25, 0.0030 DCR x 2.28 USD/DCR = 0.01 USD]
@@ -66,7 +66,7 @@ Total Fees: DCR: 0.1315, USD: 1.79
 
 2. Compact output:
 ```
-$ ./pos_income.py --format compact --first_date "2017-04-22" --last_date "2017-05-10"
+$ ./dcr_pos_income.py --format compact --first_date "2017-04-22" --last_date "2017-05-10"
 Date: 2017-04-22, Income: 22.84 USD, Fee: 0.15 USD
 Date: 2017-04-22, Income: 22.84 USD, Fee: 0.01 USD
 Date: 2017-04-23, Income: 22.66 USD, Fee: 0.01 USD

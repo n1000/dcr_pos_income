@@ -26,6 +26,8 @@ import math
 import subprocess
 
 default_format_mode = 'verbose'
+csv_prices_file = 'dcr_prices.csv'
+transactions_file = 'all_transactions.json'
 
 def exec_cmd(cmd):
     return subprocess.run(cmd, check=True, universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -67,8 +69,6 @@ def get_block_time(block_num):
     header = get_block_header(block_hash)
 
     return header['time']
-
-csv_prices_file = "dcr_prices.csv"
 
 def load_prices(filename):
     # db is [ ('date_str', price), ... ]
@@ -121,7 +121,7 @@ def main():
     fees_dcr = 0
     fees_usd = 0
 
-    with open('all_transactions.json', mode='r') as json_file:
+    with open(transactions_file, mode='r') as json_file:
         tx_db = json.load(json_file)
 
     for r in tx_db:
