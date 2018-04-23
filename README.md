@@ -23,6 +23,8 @@ was just used to vote.
   changed a lot during the day a vote takes place, the DCR/USD
   conversion ratio will be incorrect.
 
+* Only tested on *NIX platforms (no Windows testing at all yet)
+
 * Somewhat slow (due to all the dcrctl queries)
 
 ## Prerequisites
