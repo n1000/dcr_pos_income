@@ -65,10 +65,11 @@ Calculate Decred PoS Income Details
 optional arguments:
   -h, --help            show this help message and exit
   --first_date FIRST_DATE
-                        beginning of time period
+                        beginning of time period (default: 2017-01-01)
   --last_date LAST_DATE
-                        end of time period
-  --format FORMAT_MODE  select output format: verbose, compact
+                        end of time period (default: 2017-12-31)
+  --format FORMAT_MODE  select output format: verbose, compact (default:
+                        verbose)
   --prices CSV_PRICES_FILE
                         DCR CSV prices file (default: dcr_prices.csv)
   --tx_file TRANSACTIONS_FILE

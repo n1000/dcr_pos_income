@@ -100,11 +100,11 @@ def main():
     default_last_date = last_year + '-12-31'
 
     parser.add_argument('--first_date', default=default_first_date,
-        help='beginning of time period')
+        help='beginning of time period (default: {})'.format(default_first_date))
     parser.add_argument('--last_date', default=default_last_date,
-        help='end of time period')
+        help='end of time period (default: {})'.format(default_last_date))
     parser.add_argument('--format', dest='format_mode', default=default_format_mode,
-        help='select output format: verbose, compact')
+        help='select output format: verbose, compact (default: {})'.format(default_format_mode))
     parser.add_argument('--prices', dest='csv_prices_file', default=default_csv_prices_file,
         help='DCR CSV prices file (default: {})'.format(default_csv_prices_file))
     parser.add_argument('--tx_file', dest='transactions_file', default=default_transactions_file,
