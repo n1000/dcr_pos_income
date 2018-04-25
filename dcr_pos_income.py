@@ -23,62 +23,164 @@ from datetime import datetime, timezone
 import json
 import logging
 import subprocess
+import tempfile
+import sys
+import os
 
 default_format_mode = 'verbose'
 default_csv_prices_file = 'dcr_prices.csv'
 default_transactions_file = 'all_transactions.json'
 default_first_date = '1900-01-01'
 default_last_date = '9999-12-31'
+default_cache_file = 'dcrctl.cache'
 
-def exec_cmd(cmd):
-    return subprocess.run(cmd, check=True, universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+class dcrctl_cli:
+    cache_version = 1
+    unflushed_cache_cnt = 0
+    max_unflushed = 10
 
-def get_raw_tx(txid):
-    r = exec_cmd(['dcrctl', 'getrawtransaction', txid])
+    def exec_cmd(self, cmd_args):
+        r = self.get_cache(cmd_args)
+        if r != None:
+            return r
 
-    return r.stdout.strip()
+        cmd = ['dcrctl'] + cmd_args
 
-def get_decoded_tx(txid):
-    raw_tx = get_raw_tx(txid)
+        r = subprocess.run(cmd, check=True, universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    r = exec_cmd(['dcrctl', 'decoderawtransaction', raw_tx])
-    tx_contents = json.loads(r.stdout)
+        self.add_cache(cmd_args, r.stdout)
 
-    if tx_contents['txid'] != txid:
-        # TODO: enhance output, or remove sanity check
-        raise RuntimeError('TXID returned by dcrctl is not as expected!')
+        return r.stdout
 
-    return tx_contents
+    # these functions interact with dcrctl
+    def getrawtransaction(self, txid):
+        r = self.exec_cmd(['getrawtransaction', txid])
 
-def get_block_hash(block_num):
-    r = exec_cmd(['dcrctl', 'getblockhash', str(block_num)])
+        return r.strip()
 
-    return r.stdout.strip()
+    def decoderawtransaction(self, raw_tx):
+        r = self.exec_cmd(['decoderawtransaction', raw_tx])
+        tx_contents = json.loads(r)
 
-def get_block_header(block_hash):
-    r = exec_cmd(['dcrctl', 'getblockheader', block_hash])
-    header = json.loads(r.stdout)
+        return tx_contents
 
-    if header['hash'] != block_hash:
-        # TODO: enhance output, or remove sanity check
-        raise RuntimeError('Block header returned by dcrctl is not as expected!')
+    def getblockhash(self, block_num):
+        r = self.exec_cmd(['getblockhash', str(block_num)])
 
-    return header
+        return r.strip()
 
-def get_block_time(block_num):
-    block_hash = get_block_hash(block_num)
-    header = get_block_header(block_hash)
+    def getblockheader(self, block_hash):
+        r = self.exec_cmd(['getblockheader', block_hash])
+        header = json.loads(r)
 
-    return header['time']
+        return header
+
+    # helper functions that combine above operations
+    def get_decoded_tx(self, txid):
+        raw_tx = self.getrawtransaction(txid)
+        tx_contents = self.decoderawtransaction(raw_tx)
+
+        return tx_contents
+
+    def get_block_time(self, block_num):
+        block_hash = self.getblockhash(block_num)
+        header = self.getblockheader(block_hash)
+
+        return header['time']
+
+    # cache related utilities
+    def load_cache(self):
+        if self.no_cache:
+            return
+
+        try:
+            with open(self.cache_filename, mode='r') as json_file:
+                self.cache = json.load(json_file)
+        except FileNotFoundError as e:
+            print('info: {} not found, using empty cache'.format(self.cache_filename), file=sys.stderr)
+            self.cache = { 'cache_version': self.cache_version }
+
+        if self.cache['cache_version'] != self.cache_version:
+            print('info: unexpected cache version {} (expected {}), replacing'.format(self.cache['cache_version'], self.cache_version), file=sys.stderr)
+            self.cache = { 'cache_version': self.cache_version }
+
+    def save_cache(self):
+        if self.no_cache:
+            return
+
+        cache_file_dir = os.path.dirname(self.cache_filename)
+        temp_out = tempfile.NamedTemporaryFile(mode='w+', delete=False, dir=cache_file_dir)
+        json.dump(self.cache, temp_out)
+        os.rename(temp_out.name, self.cache_filename)
+
+    def cachable(self, cmd_args):
+        # currently we only cache command output for 2 arg commands
+        if len(cmd_args) == 2:
+            return True
+
+        return False
+
+    def get_cache(self, cmd_args):
+        if self.no_cache:
+            return None
+
+        if not self.cachable(cmd_args):
+            return None
+
+        cmd_type = str(cmd_args[0])
+        cmd_arg1 = str(cmd_args[1])
+
+        if cmd_type not in self.cache:
+            return None
+
+        if cmd_arg1 in self.cache[cmd_type]:
+            return self.cache[cmd_type][cmd_arg1]
+
+        return None
+
+    def add_cache(self, cmd_args, result):
+        if self.no_cache:
+            return
+
+        if not self.cachable(cmd_args):
+            return
+
+        # already cached
+        if self.get_cache(cmd_args) != None:
+            return
+
+        cmd_type = str(cmd_args[0])
+        cmd_arg1 = str(cmd_args[1])
+
+        if cmd_type not in self.cache:
+            self.cache[cmd_type] = {}
+
+        self.cache[cmd_type][cmd_arg1] = result
+
+        self.unflushed_cache_cnt += 1
+        if self.unflushed_cache_cnt >= self.max_unflushed:
+            self.save_cache()
+            self.unflushed_cache_cnt = 0
+
+    def shutdown(self):
+        if self.unflushed_cache_cnt != 0:
+            self.save_cache()
+            self.unflushed_cache_cnt = 0
+
+    def __init__(self, no_cache=False, cache_filename='dcrctl.cache', max_unflushed=10):
+        self.cache_filename = cache_filename
+        self.max_unflushed = max_unflushed
+        self.no_cache = no_cache
+
+        self.load_cache()
 
 def load_prices(filename):
-    # db is [ ('date_str', price), ... ]
-    db = []
+    db = {}
     with open(filename, newline='') as f:
         reader = csv.DictReader(f)
 
         for r in reader:
-            db += [ (r['date'], r['price(USD)']) ]
+            db[r['date']] = float(r['price(USD)'])
 
     return db
 
@@ -86,9 +188,8 @@ def get_days_price(db, date):
     utc_date = date.astimezone(timezone.utc)
     utc_date_str = utc_date.strftime('%Y-%m-%d')
 
-    for (d, p) in db:
-        if d == utc_date_str:
-            return float(p)
+    if utc_date_str in db:
+        return db[utc_date_str]
 
     raise RuntimeError('Could not find date {} in price database!'.format(utc_date_str))
 
@@ -107,6 +208,10 @@ def main():
         help='DCR CSV prices file (default: {})'.format(default_csv_prices_file))
     parser.add_argument('--tx_file', dest='transactions_file', default=default_transactions_file,
         help='DCR transactions file (default: {})'.format(default_transactions_file))
+    parser.add_argument('--no_cache', dest='no_cache',
+        action='store_true', help='disable dcrctl output caching')
+    parser.add_argument('--cache_file', dest='cache_file', default=default_cache_file,
+        help='select dcrctl cache file (default: {})'.format(default_cache_file))
 
     args = parser.parse_args()
 
@@ -127,6 +232,8 @@ def main():
     with open(args.transactions_file, mode='r') as json_file:
         tx_db = json.load(json_file)
 
+    dcrctl = dcrctl_cli(no_cache=args.no_cache, cache_filename=args.cache_file)
+
     for r in tx_db:
         utc_tstamp = int(r['blocktime'])
 
@@ -142,7 +249,7 @@ def main():
 
             logging.debug('Date: {}, Price: {:.02f}, Blocktime: {}'.format(local_tx_date_str, p_vday, utc_tstamp))
 
-            tx_contents = get_decoded_tx(r['txid'])
+            tx_contents = dcrctl.get_decoded_tx(r['txid'])
             subsidy = tx_contents['vin'][0]['amountin']
 
             cur_dcr_income = subsidy
@@ -154,7 +261,7 @@ def main():
             ticket_block = tx_contents['vin'][1]['blockheight']
 
             # get tickets block, to get timestamp
-            ticket_block_time = get_block_time(ticket_block)
+            ticket_block_time = dcrctl.get_block_time(ticket_block)
 
             # get price based on timestamp
             ticket_date = datetime.fromtimestamp(ticket_block_time, timezone.utc)
@@ -163,7 +270,7 @@ def main():
             p_tday = get_days_price(prices, ticket_date)
 
             # get fee details from ticket purchase
-            ticket_tx_contents = get_decoded_tx(tx_contents['vin'][1]['txid'])
+            ticket_tx_contents = dcrctl.get_decoded_tx(tx_contents['vin'][1]['txid'])
 
             cur_dcr_fee = ticket_tx_contents['vin'][0]['amountin'] - ticket_tx_contents['vout'][0]['value']
             cur_usd_fee = cur_dcr_fee * p_tday
@@ -178,6 +285,8 @@ def main():
 
     print('\nTotal Income: DCR: {:.04f}, USD: {:.02f}'.format(income_dcr, income_usd))
     print('Total Fees: DCR: {:.04f}, USD: {:.02f}'.format(fees_dcr, fees_usd))
+
+    dcrctl.shutdown()
 
 if __name__ == '__main__':
     main()

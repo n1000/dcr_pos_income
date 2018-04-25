@@ -25,7 +25,7 @@ was just used to vote.
 
 * Only tested on *NIX platforms (no Windows testing at all yet)
 
-* Somewhat slow (due to all the dcrctl queries)
+* Somewhat slow on first run (due to all the dcrctl queries)
 
 ## Prerequisites
 
@@ -60,7 +60,8 @@ $ ./dcr_pos_income.py --help
 usage: dcr_pos_income.py [-h] [--first_date FIRST_DATE]
                          [--last_date LAST_DATE] [--format FORMAT_MODE]
                          [--prices CSV_PRICES_FILE]
-                         [--tx_file TRANSACTIONS_FILE]
+                         [--tx_file TRANSACTIONS_FILE] [--no_cache]
+                         [--cache_file CACHE_FILE]
 
 Calculate Decred PoS Income Details
 
@@ -76,7 +77,9 @@ optional arguments:
                         DCR CSV prices file (default: dcr_prices.csv)
   --tx_file TRANSACTIONS_FILE
                         DCR transactions file (default: all_transactions.json)
-
+  --no_cache            disable dcrctl output caching
+  --cache_file CACHE_FILE
+                        select dcrctl cache file (default: dcrctl.cache)
 ```
 
 ## Example output
