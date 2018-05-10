@@ -27,6 +27,8 @@ import subprocess
 default_format_mode = 'verbose'
 default_csv_prices_file = 'dcr_prices.csv'
 default_transactions_file = 'all_transactions.json'
+default_first_date = '1900-01-01'
+default_last_date = '9999-12-31'
 
 def exec_cmd(cmd):
     return subprocess.run(cmd, check=True, universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -94,10 +96,6 @@ def main():
     logging.basicConfig(level=logging.ERROR)
 
     parser = argparse.ArgumentParser(description='Calculate Decred PoS Income Details')
-
-    last_year = str(datetime.now().year - 1)
-    default_first_date = last_year + '-01-01'
-    default_last_date = last_year + '-12-31'
 
     parser.add_argument('--first_date', default=default_first_date,
         help='beginning of time period (default: {})'.format(default_first_date))
