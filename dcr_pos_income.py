@@ -180,7 +180,11 @@ def load_prices(filename):
         reader = csv.DictReader(f)
 
         for r in reader:
-            db[r['date']] = float(r['price(USD)'])
+            try:
+                db[r['date']] = float(r['price(USD)'])
+            except ValueError:
+                # skip invalid price values
+                continue
 
     return db
 
