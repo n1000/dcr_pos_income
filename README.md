@@ -23,7 +23,7 @@ was just used to vote.
   changed a lot during the day a vote takes place, the DCR/USD
   conversion ratio will be incorrect.
 
-* Only tested on *NIX platforms (no Windows testing at all yet)
+* Only tested on \*NIX platforms (no Windows testing at all yet)
 
 * Somewhat slow on first run (due to all the dcrctl queries)
 
@@ -51,8 +51,8 @@ was just used to vote.
 $ python3 dcr_pos_income.py
 ```
 
-By default, the script will print all PoS income from the previous
-calendar year, using the verbose output format.
+By default, the script will print all PoS income using the verbose
+output format.
 
 ## Command Line Help
 ```shell-session
@@ -68,9 +68,9 @@ Calculate Decred PoS Income Details
 optional arguments:
   -h, --help            show this help message and exit
   --first_date FIRST_DATE
-                        beginning of time period (default: 2017-01-01)
+                        beginning of time period (default: 1900-01-01)
   --last_date LAST_DATE
-                        end of time period (default: 2017-12-31)
+                        end of time period (default: 9999-12-31)
   --format FORMAT_MODE  select output format: verbose, compact (default:
                         verbose)
   --prices CSV_PRICES_FILE
